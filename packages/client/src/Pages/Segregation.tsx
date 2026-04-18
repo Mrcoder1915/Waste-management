@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DashboardLayout from "../components/layouts/dashbord";
 
 export default function Segregation() {
   const [data, setData] = useState([
@@ -27,7 +28,8 @@ export default function Segregation() {
   };
 
   return (
-    <div className="p-6">
+    <DashboardLayout>
+    <div className="p-6 w-full">
       <h1 className="text-2xl font-bold mb-4">Segregation</h1>
 
       {/* FORM */}
@@ -91,5 +93,6 @@ export default function Segregation() {
         </tbody>
       </table>
     </div>
+  </DashboardLayout>
   );
 }

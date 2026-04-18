@@ -3,11 +3,12 @@ import Topbar from "../components/Topbar";
 import Cards from "../components/Cards";
 import Chart from "../components/Chart";
 import Table from "../components/Table";
+import DashboardLayout from "../components/layouts/dashbord";
 
 const Dashboard = () => {
   return (
-    <div className="flex bg-gray-100 min-h-screen">
-      <Sidebar />
+    <DashboardLayout>
+    <div className="flex w-full bg-gray-100 min-h-screen">
 
       <div className="flex-1 p-8">
         <Topbar />
@@ -16,6 +17,7 @@ const Dashboard = () => {
         <Table />
       </div>
     </div>
+    </DashboardLayout>
   );
 }
 
