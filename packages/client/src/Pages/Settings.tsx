@@ -1,4 +1,5 @@
 import { useState, FC } from "react";
+import DashboardLayout from "../components/layouts/dashbord";
 
 const Settings: FC = () => {
 
@@ -28,7 +29,8 @@ const Settings: FC = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-100 min-h-screen">
+    <DashboardLayout>
+    <div className="p-6 bg-gray-100 w-full min-h-screen">
       <h1 className="text-2xl font-bold mb-6">Settings</h1>
 
       <div className="bg-white p-6 rounded shadow max-w-xl">
@@ -100,6 +102,7 @@ const Settings: FC = () => {
 
       </div>
     </div>
+    </DashboardLayout>
   );
 };
 
