@@ -20,16 +20,19 @@ const SLIDES = [
   { id: "residual", label: "Residual", src: "/last.png", color: "bg-red-500" },
 ];
 
-const auth = ({ children }: { children: ReactNode }) => {
+const AuthLayout = ({ children }: { children: ReactNode }) => {
   const [emblaRef] = useEmblaCarousel({ loop: true }, [
     Autoplay({ delay: 3000 }),
   ]);
   return (
-    <div className="main-bg-gradient w-full grid lg:grid-cols-2 justify-items-center items-center min-h-screen py-10">
+    <div className="main-bg-gradient w-full grid md:grid-cols-2 justify-items-center items-center min-h-screen py-10">
       <Container>
-        <h1 className="[font-family:var(--header-font)] font-(--header-font-weight)  [font-size:var(--header-font-size)] text-(--header-text) ">WELCOME TO {' '} <span className="text-(--main-secondary)">WASTE MANAGEMENT</span></h1>
+        <h1 className="[font-family:var(--header-font)] font-(--header-font-weight)  lg:[font-size:var(--header-font-size)] text-(--header-text) ">
+          WELCOME TO{" "}
+          <span className="text-(--main-secondary)">WASTE MANAGEMENT</span>
+        </h1>
         <EmblaContainer ref={emblaRef}>
-          <div className="w-2xs lg:w-xl flex">
+          <div className="w-2xs lg:w-xl flex select-none">
             {SLIDES.map((slide) => (
               <div
                 key={slide.id}
@@ -41,8 +44,6 @@ const auth = ({ children }: { children: ReactNode }) => {
                   <Image
                     src={slide.src}
                     alt={slide.label}
-                    width={150}
-                    height={150}
                     className="hover:scale-110 transition-transform duration-300"
                   />
                 </div>
@@ -56,4 +57,4 @@ const auth = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export default auth;
+export default AuthLayout;

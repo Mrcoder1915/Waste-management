@@ -3,5 +3,6 @@
     ## How to run
 
         # navigate to root directory
+            install dev dependencies: npm install
             run ui only: npm run dev:ui
             run ui and server: npm run dev
