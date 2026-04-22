@@ -1,14 +1,42 @@
-import { ReactNode } from "react";
-import { Container } from "../catalyst/container";
+import { useState, ReactNode } from "react";
+import { FaBars } from "react-icons/fa";
 import Sidebar from "../Sidebar";
+import { FaHome, FaRecycle, FaChartLine, FaCog } from "react-icons/fa";
+
+const navItems = [
+  { name: "Overview", icon: <FaHome />, path: "/" },
+  { name: "Segregation", icon: <FaRecycle />, path: "/segregation" },
+  { name: "Reports", icon: <FaChartLine />, path: "/reports" },
+  { name: "Settings", icon: <FaCog />, path: "/settings" },
+];
 
 const DashboardLayout = ({ children }: { children: ReactNode }) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <div className="w-full flex flex-row lg:overflow-hidden lg:pl-64">
-      <Container className="flex h-screen! lg:w-64  justify-center fixed left-0">
-        <Sidebar />
-      </Container>
-      <Container className="flex-1">{children}</Container>
+    <div className="min-h-screen flex bg-gray-50">
+      {/* SIDEBAR Component */}
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        navItems={navItems}
+      />
+
+      {/* MAIN CONTENT AREA */}
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        {/* MOBILE TOP BAR (Only visible on small screens) */}
+        <header className="lg:hidden bg-green-900 text-white p-4 flex items-center justify-between shadow-md">
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="text-2xl p-1"
+          >
+            <FaBars />
+          </button>
+        </header>
+
+        {/* PAGE CONTENT */}
+        <main className="flex-1 overflow-y-auto p-4 lg:p-8">{children}</main>
+      </div>
     </div>
   );
 };

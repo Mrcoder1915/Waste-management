@@ -1,59 +1,73 @@
-import {
-  FaHome,
-  FaRecycle,
-  FaChartLine,
-  FaCog,
-  FaSignOutAlt,
-} from "react-icons/fa";
+import { FaTimes, FaSignOutAlt } from "react-icons/fa";
 import { useUser, useClerk } from "@clerk/react";
 import { Link } from "react-router-dom";
+import { JSX } from "react";
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen: boolean;
+  onClose?: () => void;
+  navItems: { name: string; icon: JSX.Element; path: string }[];
+}
+
+export default function Sidebar({ isOpen, onClose, navItems }: SidebarProps) {
   const { user } = useUser();
   const clerk = useClerk();
 
-  const handleLogout = () => {
-    clerk.signOut();
-  };
-
-  const nav = [
-    { name: "Overview", icon: <FaHome />, path: "/" },
-    { name: "Segregation", icon: <FaRecycle />, path: "/segregation" },
-    { name: "Reports", icon: <FaChartLine />, path: "/reports" },
-    { name: "Settings", icon: <FaCog />, path: "/settings" },
-  ];
-
   return (
-    <div className="w-0 invisible lg:visible lg:w-full flex-1 bg-gradient-to-b from-green-900 to-green-800 text-white flex flex-col justify-between p-6">
-      <div>
-        <h2 className="text-xl font-bold mb-6">WASTE SYSTEM</h2>
+    <>
+      {/* 1. MOBILE OVERLAY (Darkens the background when sidebar is open) */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity"
+          onClick={onClose}
+        />
+      )}
 
-        <ul className="space-y-3">
-          {nav.map((item, index) => (
-            <Link to={item.path}>
-              <li
-                key={index}
-                className="p-3 hover:bg-green-700 rounded flex items-center gap-2"
+      {/* 2. SIDEBAR PANEL */}
+      <div
+        className={`
+          fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-green-900 to-green-800 text-white 
+          transform transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between
+          ${isOpen ? "translate-x-0" : "-translate-x-full"} 
+          lg:translate-x-0 lg:static lg:flex
+        `}
+      >
+        <div>
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-xl font-bold">WASTE SYSTEM</h2>
+            {/* Close button - Only visible on mobile */}
+            <button onClick={onClose} className="lg:hidden text-2xl">
+              <FaTimes />
+            </button>
+          </div>
+
+          <ul className="space-y-3">
+            {navItems.map((item) => (
+              <Link
+                to={item.path}
+                key={item.path} // Key goes on the Link
+                onClick={onClose} // Close sidebar when a link is clicked
               >
-                {" "}
-                {item.icon} {item.name}
-              </li>
-            </Link>
-          ))}
-        </ul>
-      </div>
+                <li className="p-3 hover:bg-green-700 rounded flex items-center gap-3 transition-colors">
+                  {item.icon} {item.name}
+                </li>
+              </Link>
+            ))}
+          </ul>
+        </div>
 
-      <div>
-        <p className="mb-2">
-          {user?.firstName} {user?.lastName}
-        </p>
-        <button
-          className="flex items-center gap-2 text-sm"
-          onClick={handleLogout}
-        >
-          <FaSignOutAlt /> Logout
-        </button>
+        <div className="border-t border-green-700 pt-6">
+          <p className="mb-2 font-medium">
+            {user?.firstName} {user?.lastName}
+          </p>
+          <button
+            className="flex items-center gap-2 text-sm hover:text-red-300 transition-colors"
+            onClick={() => clerk.signOut()}
+          >
+            <FaSignOutAlt /> Logout
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
