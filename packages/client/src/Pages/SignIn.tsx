@@ -1,17 +1,19 @@
-import { SignIn, useUser } from "@clerk/react"
+import { SignIn, useUser } from "@clerk/react";
 import { Navigate } from "react-router-dom";
 import Auth from "../components/layouts/auth";
 
 const SignInPage = () => {
-  const {user} = useUser();
+  const { user, isLoaded } = useUser();
+
+  if (!isLoaded) return null;
 
   if (user) return <Navigate to="/" />;
 
   return (
     <Auth>
-        <SignIn/>
+      <SignIn />
     </Auth>
-  )
-}
+  );
+};
 
-export default SignInPage
+export default SignInPage;

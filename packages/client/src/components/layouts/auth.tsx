@@ -25,21 +25,21 @@ const AuthLayout = ({ children }: { children: ReactNode }) => {
     Autoplay({ delay: 3000 }),
   ]);
   return (
-    <div className="main-bg-gradient w-full grid md:grid-cols-2 justify-items-center items-center min-h-screen py-10">
+    <div className="main-bg-gradient w-full grid grid-cols-1 md:grid-cols-2 justify-items-center items-center min-h-screen py-10">
       <Container>
         <h1 className="[font-family:var(--header-font)] font-(--header-font-weight)  lg:[font-size:var(--header-font-size)] text-(--header-text) ">
           WELCOME TO{" "}
           <span className="text-(--main-secondary)">WASTE MANAGEMENT</span>
         </h1>
         <EmblaContainer ref={emblaRef}>
-          <div className="w-2xs lg:w-xl flex select-none">
+          <div className="flex select-none">
             {SLIDES.map((slide) => (
               <div
                 key={slide.id}
                 className="flex-[0_0_100%] min-w-0 flex flex-col items-center p-6"
               >
                 <div
-                  className={`p-8 rounded-full ${slide.color} mb-4 shadow-inner`}
+                  className={`p-8 w-xs lg:w-xl rounded-full ${slide.color} mb-4 shadow-inner`}
                 >
                   <Image
                     src={slide.src}
