@@ -28,3 +28,11 @@
 
   /* subheader */
 }
+.btn {
+  @apply bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition;
+}
+
+.btn-danger {
+  @apply bg-red-500 text-white py-2 rounded-lg hover:bg-red-600 transition;
+}
+

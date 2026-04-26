@@ -41,7 +41,7 @@ export default function BeautifulReports() {
             <h1 className="text-3xl font-black tracking-tight text-slate-900">Waste Analytics</h1>
             <p className="text-slate-500 font-medium">Monitoring segregation performance & system health.</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 flex-col md:flex-row">
              <button className="bg-white px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold shadow-sm hover:shadow-md transition">Export</button>
              <button className="bg-emerald-600 px-5 py-2.5 rounded-xl text-white text-sm font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition">Live View</button>
           </div>

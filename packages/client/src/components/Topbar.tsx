@@ -11,7 +11,7 @@ export default function Topbar() {
       </div>
 
       <div className="flex items-center gap-4">
-        <div className="bg-white px-3 py-2 rounded shadow text-sm">
+        <div className="bg-white px-3 py-2 rounded shadow text-sm invisible md:visible">
           April 5, 2024
         </div>
         <FaBell className="text-gray-500" />
