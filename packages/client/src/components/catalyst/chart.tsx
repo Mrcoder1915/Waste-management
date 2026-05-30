@@ -7,7 +7,10 @@ export const ChartContainer = ({
 }: ComponentProps<"div">) => {
   return (
     <div
-      className={clsx(`p-6 bg-white rounded-2xl shadow-2xl `, className)}
+      className={clsx(
+        `p-6 flex flex-col min-h-92 h-auto bg-white rounded-2xl shadow-2xl relative`,
+        className,
+      )}
       {...props}
     />
   );

@@ -7,81 +7,25 @@ import DashboardLayout from "../components/layouts/dashbord";
 import { useUser } from "@clerk/react";
 
 import {
-  AreaChart,
-  Area,
+  LineChart,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
+  ResponsiveContainer,
 } from "recharts";
 import { Container, ItemContainer } from "../components/catalyst/container";
 import { ProgressBar } from "../components/ProgressBar";
 
 const data = [
-  {
-    name: "Page A",
-    uv: 0,
-    pv: 2400,
-    amt: 2400,
-  },
-  {
-    name: "Page B",
-    uv: 9000,
-    amt: 2210,
-  },
-  {
-    name: "Page C",
-    uv: 2000,
-    pv: 9800,
-    amt: 2290,
-  },
-  {
-    name: "Page D",
-    uv: 6080,
-    amt: 2000,
-  },
-  {
-    name: "Page E",
-    uv: 1890,
-    amt: 2181,
-  },
-  {
-    name: "Page F",
-    uv: 4090,
-    amt: 2500,
-  },
-  {
-    name: "Page G",
-    uv: 10000,
-    amt: 2100,
-  },
-];
-
-const data1 = [
-  {
-    title: "Biodegradable",
-    value: 580,
-    icon: <FaLeaf />,
-    color: "text-green-500",
-  },
-  {
-    title: "Recyclable",
-    value: 355,
-    icon: <FaRecycle />,
-    color: "text-blue-500",
-  },
-  {
-    title: "Residual",
-    value: 235,
-    icon: <FaTrash />,
-    color: "text-yellow-500",
-  },
-  {
-    title: "Total Waste",
-    value: 1170,
-    icon: <FaChartPie />,
-    color: "text-purple-500",
-  },
+  { name: "Jan", Biodegradable: 400, NonBiodegradable: 240, Residual: 110 },
+  { name: "Feb", Biodegradable: 300, NonBiodegradable: 139, Residual: 500 },
+  { name: "Mar", Biodegradable: 200, NonBiodegradable: 980, Residual: 229 },
+  { name: "Apr", Biodegradable: 700, NonBiodegradable: 390, Residual: 200 },
+  { name: "May", Biodegradable: 189, NonBiodegradable: 480, Residual: 218 },
+  { name: "Jun", Biodegradable: 239, NonBiodegradable: 380, Residual: 250 },
 ];
 
 const Dashboard = () => {
@@ -151,36 +95,75 @@ const Dashboard = () => {
               <h2 className="mb-4 text-2xl font-semibold">
                 Todays Segragation Trends
               </h2>
-              <AreaChart
-                style={{
-                  width: "100%",
-                  height: "90%",
-                  aspectRatio: 1.618,
-                }}
-                responsive
-                data={data}
-                margin={{
-                  top: 20,
-                  right: 0,
-                  left: 0,
-                  bottom: 0,
-                }}
-                onContextMenu={(_, e) => e.preventDefault()}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" niceTicks="snap125" />
-                <YAxis width="auto" niceTicks="snap125" />
-                <Tooltip />
-                <Area
-                  type="monotone"
-                  dot={{
-                    fill: "blue",
-                  }}
-                  dataKey="uv"
-                  stroke="#8884d8"
-                  fill="#8884d8"
-                />
-              </AreaChart>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                  data={data}
+                  margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="#e5e7eb"
+                  />
+
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#6b7280", fontSize: 12 }}
+                    dy={10}
+                  />
+
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fill: "#6b7280", fontSize: 12 }}
+                  />
+
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: "8px",
+                      border: "none",
+                      boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                      padding: "10px",
+                    }}
+                  />
+
+                  <Legend
+                    verticalAlign="top"
+                    align="right"
+                    iconType="circle"
+                    wrapperStyle={{ paddingBottom: "20px" }}
+                  />
+                  <Line
+                    name="Biodegradable"
+                    type="monotone"
+                    dataKey="Biodegradable"
+                    stroke="#10b981"
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: "#10b981" }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
+                  />
+                  <Line
+                    name="Non Biodegrable"
+                    type="monotone"
+                    dataKey="NonBiodegradable"
+                    stroke="#3b82f6"
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: "#3b82f6" }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
+                  />
+                  <Line
+                    name="Residual"
+                    type="monotone"
+                    dataKey="Residual"
+                    stroke="#f59e0b"
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: "#f59e0b" }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </ChartContainer>
             <ItemContainer className="flex-col p-5 bg-white ">
               <h1 className="mb-4 text-2xl font-semibold">

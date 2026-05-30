@@ -28,7 +28,7 @@ export const EmblaContainer = ({
 }: ComponentProps<"div">) => {
   return (
     <div
-      className={`flex items-center justify-center ${className}`}
+      className={`hidden md:flex items-center justify-center  ${className}`}
       {...props}
     />
   );
