@@ -1,5 +1,5 @@
 import { FaTimes, FaSignOutAlt } from "react-icons/fa";
-import { useUser, useClerk } from "@clerk/react";
+import { signOut, useSession } from "../lib/auth-client";
 import { Link } from "react-router-dom";
 import { JSX } from "react";
 
@@ -10,8 +10,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose, navItems }: SidebarProps) {
-  const { user } = useUser();
-  const clerk = useClerk();
+  const { data: session, isPending } = useSession();
 
   return (
     <>
@@ -57,12 +56,10 @@ export default function Sidebar({ isOpen, onClose, navItems }: SidebarProps) {
         </div>
 
         <div className="border-t border-green-700 pt-6">
-          <p className="mb-2 font-medium">
-            {user?.firstName} {user?.lastName}
-          </p>
+          <p className="mb-2 font-medium">{session?.user?.name}</p>
           <button
             className="flex items-center gap-2 text-sm hover:text-red-300 transition-colors"
-            onClick={() => clerk.signOut()}
+            onClick={() => signOut()}
           >
             <FaSignOutAlt /> Logout
           </button>

@@ -1,11 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useUser } from "@clerk/react";
+import { useSession } from "../lib/auth-client";
 
 const Protected = () => {
-  const { user, isLoaded } = useUser();
+  const { data: session, isPending } = useSession();
 
-  if (!isLoaded) return null;
-  if (!user) return <Navigate to="/sign-in" />;
+  if (isPending) return null;
+
+  if (!session) return <Navigate to="/sign-in" />;
 
   return <Outlet />;
 };

@@ -1,10 +1,11 @@
-import {Routes, Route, BrowserRouter} from "react-router-dom";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import Dashboard from "./Pages/Dashboard";
 import SignInPage from "./Pages/SignIn";
 import Protected from "./ProtectedRoute/Protected";
 import Segregation from "./Pages/Segregation";
 import Reports from "./Pages/Reports";
 import Settings from "./Pages/Settings";
+import NotFound from "./Pages/NotFound";
 
 export default function App() {
   return (
@@ -15,12 +16,10 @@ export default function App() {
           <Route path="/segregation" element={<Segregation />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
-
         </Route>
         <Route path="/sign-in" element={<SignInPage />} />
-        
+        <Route path="*" element={<NotFound />} />
       </Routes>
-      
     </BrowserRouter>
   );
 }
