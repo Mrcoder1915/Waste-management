@@ -7,14 +7,11 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=client\" \"npm run dev --workspace=api\"",
+    "dev": "bun run --filter '**/*' dev",
     "dev:ui": "npm run dev --workspace=client",
     "build:ui": "npm run build --workspace=client"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "clsx": "^2.1.1"
-  }
+  "license": "ISC"
 }

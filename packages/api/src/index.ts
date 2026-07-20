@@ -1,13 +1,14 @@
-import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { auth } from "./lib/auth.ts"; // path to your auth file
+import { createAuth } from "./lib/auth.ts";
 import { cors } from "hono/cors";
+import { env } from "hono/adapter";
+import { BINDINGS } from "./types/factory.ts";
 
-const app = new Hono();
+const app = new Hono<BINDINGS>();
 app.use(
-  "/api/*", // or replace with "*" to enable cors for all routes
+  "/api/*",
   cors({
-    origin: "http://localhost:5173", // replace with your origin
+    origin: "http://localhost:5173",
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS"],
     exposeHeaders: ["Content-Length"],
@@ -15,10 +16,27 @@ app.use(
     credentials: true,
   }),
 );
-app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
-app.get("/", (c) => c.text("Hello Node.jsss!"));
 
-serve({
-  fetch: app.fetch,
-  port: 8787,
+app.use("*", async (c, next) => {
+  const authInstance = createAuth(env(c));
+  c.set("auth", authInstance);
+  await next();
 });
+
+app.on(["POST", "GET"], "/api/auth/*", (c) => {
+  return c.var.auth.handler(c.req.raw);
+});
+app.onError((err, c) => {
+  console.error(`[Server Error]: ${err}`);
+
+  if (c.env.APP === "local") {
+    return c.text(`Local Debug: ${err.message || String(err)}`, 500);
+  }
+
+  return c.text("Oops! Something went wrong on our end.", 500);
+});
+app.get("/", (c) => {
+  return c.json("Hello Hono.jsss!");
+});
+
+export default app;
