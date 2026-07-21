@@ -1,7 +1,13 @@
 import { neon } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
-import "dotenv/config";
+import { ulid } from "ulid";
+
+export const generateUlid = (prefix: string) => {
+  return () => `${prefix}_${ulid()}`.toLowerCase();
+};
 
 // Initialize Neon connection
-const sql = neon(process.env.DATABASE_URL!);
-export const db = drizzle(sql);
+export const createDB = ({ databaseUrl }: { databaseUrl: string }) => {
+  const sql = neon(databaseUrl);
+  return drizzle(sql);
+};
