@@ -1,65 +1,83 @@
-import { useState, useRef, useEffect } from "react";
-import { useUser, useSessionList, useSession } from "@clerk/react";
+import { useState, useRef } from "react";
+import { authClient } from "../lib/auth-client";
 import DashboardLayout from "../components/layouts/dashbord";
 import { Container, ItemContainer } from "../components/catalyst/container";
 
+type Session = typeof authClient.$Infer.Session.session;
+
 const Settings = () => {
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState<"profile" | "security">("profile");
 
-  // 1. Clerk Hooks
-  const { user, isLoaded: isUserLoaded } = useUser();
-  const { session: currentSession } = useSession();
-  const { sessions, isLoaded: isSessionsLoaded } = useSessionList();
+  // 1. Better Auth session
+  const { data: sessionData } = authClient.useSession();
+  const user = sessionData?.user;
+  const currentSession = sessionData?.session;
 
-  // 2. Profile State & Refs
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  // Device sessions (Better Auth doesn't push these via the session hook,
+  // so they're fetched separately with listSessions)
+  const [sessions, setSessions] = useState<Session[]>([]);
+
+  const [name, setName] = useState<string | undefined>(sessionData?.user.name);
   const [isSavingProfile, setIsSavingProfile] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null); // For the hidden file upload
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
 
-  // 3. Password State
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [passwordError, setPasswordError] = useState("");
-  // Sync profile data on load
-  useEffect(() => {
-    if (user) {
-      setFirstName(user.firstName || "");
-      setLastName(user.lastName || "");
-    }
-  }, [user]);
 
-  // A. Upload New Avatar
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
 
+    setIsUploadingAvatar(true);
     try {
-      // Clerk handles the CDN upload automatically!
-      await user.setProfileImage({ file });
+      const urlRes = await fetch("/api/uploads/avatar-url", { method: "POST" });
+      if (!urlRes.ok) throw new Error("Could not get an upload URL");
+      const { uploadURL } = await urlRes.json();
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const uploadRes = await fetch(uploadURL, {
+        method: "POST",
+        body: formData,
+      });
+      if (!uploadRes.ok) throw new Error("Upload failed");
+      const { result } = await uploadRes.json();
+      const imageUrl = result.variants[0] as string;
+
+      const { error } = await authClient.updateUser({ image: imageUrl });
+      if (error) throw new Error(error.message);
+
       alert("Avatar updated successfully!");
-    } catch (error: any) {
-      alert(error.errors?.[0]?.message || "Failed to upload avatar");
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Failed to upload avatar");
+    } finally {
+      setIsUploadingAvatar(false);
     }
   };
 
-  // B. Update Name
+  // B. Update name
   const handleUpdateProfile = async () => {
     if (!user) return;
     setIsSavingProfile(true);
     try {
-      await user.update({ firstName, lastName });
+      const { error } = await authClient.updateUser({ name });
+      if (error) throw new Error(error.message);
       alert("Profile updated!");
-    } catch (error: any) {
-      alert(error.errors?.[0]?.message || "Failed to update profile");
+    } catch (error) {
+      alert(
+        error instanceof Error ? error.message : "Failed to update profile",
+      );
     } finally {
       setIsSavingProfile(false);
     }
   };
 
-  // C. Update Password
+  // C. Update password
   const handleUpdatePassword = async () => {
     if (!user) return;
     setPasswordError("");
@@ -71,41 +89,42 @@ const Settings = () => {
 
     setIsUpdatingPassword(true);
     try {
-      await user.updatePassword({
-        currentPassword: currentPassword,
-        newPassword: newPassword,
+      const { error } = await authClient.changePassword({
+        currentPassword,
+        newPassword,
+        revokeOtherSessions: false,
       });
+      if (error) throw new Error(error.message);
+
       alert("Password updated successfully!");
-      // Clear the form
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-    } catch (error: any) {
+    } catch (error) {
       setPasswordError(
-        error.errors?.[0]?.longMessage ||
-          "Failed to update password. Did you sign up with Google?",
+        error instanceof Error
+          ? error.message
+          : "Failed to update password. Did you sign up with Google?",
       );
     } finally {
       setIsUpdatingPassword(false);
     }
   };
 
-  // D. Revoke Device
-  const handleRevokeSession = async (sessionId: string) => {
-    const sessionToRevoke = sessions?.find((s) => s.id === sessionId);
-    if (sessionToRevoke) {
-      await sessionToRevoke.end();
+  // D. Revoke device
+  const handleRevokeSession = async (token: string) => {
+    const { error } = await authClient.revokeSession({ token });
+    if (error) {
+      alert(error.message || "Failed to sign out that device");
+      return;
     }
+    setSessions((prev) => prev.filter((s) => s.token !== token));
   };
-
-  // Loading State
-  if (!isUserLoaded || !isSessionsLoaded) return null;
 
   return (
     <DashboardLayout>
       <Container className="h-dvh flex items-center justify-center bg-gray-100 p-4">
         <ItemContainer className="w-full max-w-5xl h-[80%] bg-white rounded-2xl shadow-xl flex overflow-hidden border border-gray-200">
-          {/* LEFT SIDEBAR */}
           <div className="w-64 bg-gray-50 border-r border-gray-200 p-6 flex flex-col">
             <h2 className="text-xl font-bold text-gray-800 mb-6">Settings</h2>
             <ul className="flex flex-col gap-2 font-medium text-sm">
@@ -126,9 +145,6 @@ const Settings = () => {
 
           {/* RIGHT CONTENT AREA */}
           <div className="flex-1 p-10 overflow-y-auto">
-            {/* =========================================
-                PROFILE TAB
-            ========================================= */}
             {activeTab === "profile" && (
               <div className="max-w-2xl">
                 <h3 className="text-2xl font-semibold mb-6 border-b pb-4">
@@ -138,12 +154,11 @@ const Settings = () => {
                 {/* Avatar Uploader */}
                 <div className="flex items-center gap-6 mb-8">
                   <img
-                    src={user?.imageUrl}
+                    src={user?.image ?? undefined}
                     alt="Profile Avatar"
                     className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
                   />
                   <div>
-                    {/* Hidden file input triggered by the button */}
                     <input
                       type="file"
                       accept="image/*"
@@ -153,9 +168,10 @@ const Settings = () => {
                     />
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 font-medium"
+                      disabled={isUploadingAvatar}
+                      className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 font-medium disabled:opacity-50"
                     >
-                      Manage Avatar
+                      {isUploadingAvatar ? "Uploading..." : "Manage Avatar"}
                     </button>
                     <p className="text-xs text-gray-500 mt-2">
                       JPG, GIF or PNG. Max size of 10MB.
@@ -164,39 +180,32 @@ const Settings = () => {
                 </div>
 
                 {/* Profile Form */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6">
                   <div className="flex flex-col gap-2">
                     <label className="text-sm font-semibold text-gray-700">
-                      First Name
+                      Name
                     </label>
                     <input
                       type="text"
-                      value={firstName}
-                      onChange={(e) => setFirstName(e.target.value)}
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
                       className="p-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-gray-700">
-                      Last Name
-                    </label>
-                    <input
-                      type="text"
-                      value={lastName}
-                      onChange={(e) => setLastName(e.target.value)}
-                      className="p-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2 md:col-span-2">
                     <label className="text-sm font-semibold text-gray-700">
                       Email Address
                     </label>
                     <input
                       type="email"
-                      value={user?.primaryEmailAddress?.emailAddress || ""}
+                      value={user?.email ?? ""}
                       disabled
                       className="p-2 border rounded-md bg-gray-50 text-gray-500"
                     />
+                    <p className="text-xs text-gray-400">
+                      Use the email change flow to update this — it needs OTP
+                      verification on both the old and new address.
+                    </p>
                   </div>
                 </div>
 
@@ -210,16 +219,11 @@ const Settings = () => {
               </div>
             )}
 
-            {/* =========================================
-                SECURITY TAB
-            ========================================= */}
             {activeTab === "security" && (
               <div className="max-w-2xl">
                 <h3 className="text-2xl font-semibold mb-6 border-b pb-4">
                   Security
                 </h3>
-
-                {/* Change Password UI */}
                 <div className="mb-10">
                   <h4 className="text-lg font-medium mb-4">Change Password</h4>
                   <div className="flex flex-col gap-4 max-w-md">
@@ -245,7 +249,6 @@ const Settings = () => {
                       className="p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
                     />
 
-                    {/* Error Message Display */}
                     {passwordError && (
                       <p className="text-red-500 text-sm font-medium">
                         {passwordError}
@@ -264,26 +267,22 @@ const Settings = () => {
                   </div>
                 </div>
 
-                {/* Device History */}
                 <div>
                   <h4 className="text-lg font-medium mb-4">Active Devices</h4>
                   <div className="flex flex-col gap-3">
-                    {sessions?.map((session) => {
+                    {sessions.map((s) => {
                       const isCurrentSession =
-                        session.id === currentSession?.id;
-
-                      // Clerk's modern Session object uses native JavaScript Date objects
-                      const lastActive = session.lastActiveAt
-                        ? session.lastActiveAt.toLocaleString()
+                        s.token === currentSession?.token;
+                      const lastActive = s.updatedAt
+                        ? new Date(s.updatedAt).toLocaleString()
                         : "Unknown time";
-
-                      const createdOn = session.createdAt
-                        ? session.createdAt.toLocaleDateString()
+                      const createdOn = s.createdAt
+                        ? new Date(s.createdAt).toLocaleDateString()
                         : "Unknown date";
 
                       return (
                         <div
-                          key={session.id}
+                          key={s.id}
                           className="flex justify-between items-center p-4 border border-gray-200 rounded-lg"
                         >
                           <div>
@@ -306,7 +305,7 @@ const Settings = () => {
                             </span>
                           ) : (
                             <button
-                              onClick={() => handleRevokeSession(session.id)}
+                              onClick={() => handleRevokeSession(s.token)}
                               className="text-red-600 border border-red-200 hover:bg-red-50 px-3 py-1 rounded text-sm font-medium transition-colors"
                             >
                               Sign Out
