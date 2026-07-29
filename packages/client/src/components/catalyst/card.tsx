@@ -1,4 +1,15 @@
+import { LucideIcon } from "lucide-react";
 import { ComponentProps } from "react";
+import { Tone } from "../../lib/tone-style";
+import { IconBadge } from "./badge";
+
+export interface StatCardProps {
+  icon: LucideIcon;
+  tone: Tone;
+  label: string;
+  value: string;
+  sub: string;
+}
 
 export const CardContainer = ({
   className,
@@ -20,3 +31,18 @@ export const Card = ({ className, ...props }: ComponentProps<"div">) => {
     ></div>
   );
 };
+
+export function StatCard({ icon, tone, label, value, sub }: StatCardProps) {
+  return (
+    <div className="bg-white rounded-2xl border border-slate-200/70 shadow-sm p-5 flex items-center gap-4">
+      <IconBadge icon={icon} tone={tone} />
+      <div>
+        <p className="text-xs text-slate-400">{label}</p>
+        <p className="text-2xl font-semibold text-slate-900 leading-tight">
+          {value}
+        </p>
+        <p className="text-[11px] text-slate-400">{sub}</p>
+      </div>
+    </div>
+  );
+}

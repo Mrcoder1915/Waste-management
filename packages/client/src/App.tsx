@@ -6,6 +6,8 @@ import Segregation from "./Pages/Segregation";
 import Reports from "./Pages/Reports";
 import Settings from "./Pages/Settings";
 import NotFound from "./Pages/NotFound";
+import SuperAdmin from "./Pages/super-admin/Dashboard";
+import SuperAdminProtection from "./ProtectedRoute/super-admin";
 
 export default function App() {
   return (
@@ -16,6 +18,9 @@ export default function App() {
           <Route path="/segregation" element={<Segregation />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route element={<SuperAdminProtection />}>
+            <Route path="/super-admin" element={<SuperAdmin />} />
+          </Route>
         </Route>
         <Route path="/sign-in" element={<SignInPage />} />
         <Route path="*" element={<NotFound />} />

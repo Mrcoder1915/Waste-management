@@ -53,6 +53,7 @@ const SignInPage = () => {
           {loading ? " loading..." : "Sign In"}
         </button>
       </div>
+      {/* <AuthForm /> */}
     </Auth>
   );
 };
