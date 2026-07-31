@@ -17,7 +17,7 @@ export const CardContainer = ({
 }: ComponentProps<"div">) => {
   return (
     <div
-      className={`w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 p-2  bg-noneshadow gap-6 ${className}`}
+      className={`w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 p-2  bg-none gap-6 ${className}`}
       {...props}
     />
   );

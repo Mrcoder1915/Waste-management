@@ -22,18 +22,6 @@ export const ItemContainer = ({
   );
 };
 
-export const EmblaContainer = ({
-  className,
-  ...props
-}: ComponentProps<"div">) => {
-  return (
-    <div
-      className={`hidden md:flex items-center justify-center  ${className}`}
-      {...props}
-    />
-  );
-};
-
 export const Image = ({ className, ...props }: ComponentProps<"img">) => {
   return (
     <img
