@@ -2,6 +2,7 @@ import { FaTimes, FaSignOutAlt } from "react-icons/fa";
 import { signOut, useSession } from "../lib/auth-client";
 import { Link } from "react-router-dom";
 import { JSX } from "react";
+import { Recycle } from "lucide-react";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -25,7 +26,7 @@ export default function Sidebar({ isOpen, onClose, navItems }: SidebarProps) {
       {/* 2. SIDEBAR PANEL */}
       <div
         className={`
-          fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-green-900 to-green-800 text-white 
+          fixed inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-[#07160F] to-[#0C2A1C] text-white 
           transform transition-transform duration-300 ease-in-out p-6 flex flex-col justify-between
           ${isOpen ? "translate-x-0" : "-translate-x-full"} 
           lg:translate-x-0 lg:static lg:flex
@@ -33,8 +34,19 @@ export default function Sidebar({ isOpen, onClose, navItems }: SidebarProps) {
       >
         <div>
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-bold">WASTE SYSTEM</h2>
-            {/* Close button - Only visible on mobile */}
+            <div className="flex items-center gap-2.5">
+              <div className="size-9 rounded-lg bg-emerald-500/15 flex items-center justify-center">
+                <Recycle className="size-5 text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold leading-tight">
+                  Waste Management
+                </p>
+                <p className="text-[11px] text-white/40 leading-tight">
+                  Robotics Arm Segregation
+                </p>
+              </div>
+            </div>
             <button onClick={onClose} className="lg:hidden text-2xl">
               <FaTimes />
             </button>

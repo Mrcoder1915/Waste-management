@@ -1,24 +1,34 @@
 import { Search } from "lucide-react";
 import React, { forwardRef } from "react";
+import { cx } from "../../lib/cx";
 
-export const Input = forwardRef(
-  (
-    {
-      className,
-      ...props
-    }: {
-      className?: string;
-      type?:
-        | "email"
-        | "number"
-        | "password"
-        | "search"
-        | "tel"
-        | "text"
-        | "url";
-    },
-    ref: React.ForwardedRef<HTMLInputElement>,
-  ) => <input className={` ${className}`} {...props} ref={ref} />,
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type = "text", ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cx(
+          // 1. Base Layout & Box Model
+          "flex h-10 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm",
+
+          "text-slate-900 placeholder:text-slate-400",
+
+          "transition-colors focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/30",
+
+          "disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-slate-50",
+
+          "file:border-0 file:bg-transparent file:text-sm file:font-medium",
+
+          // Merge custom classes passed from the parent
+          className,
+        )}
+        ref={ref}
+        {...props}
+      />
+    );
+  },
 );
 
 interface SearchInputProps {
