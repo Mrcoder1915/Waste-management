@@ -1,4 +1,4 @@
-export interface env {
+export type env = {
   DATABASE_URL: string;
   AUTH_SECRET: string;
   AUTH_BASE_URL: string;
@@ -6,4 +6,4 @@ export interface env {
   GOOGLE_CLIENT_SECRET: string;
   RESEND_API_KEY: string;
   APP: "production" | "development" | "local";
-}
+};

@@ -54,11 +54,7 @@ export default function Sidebar({ isOpen, onClose, navItems }: SidebarProps) {
 
           <ul className="space-y-3">
             {navItems.map((item) => (
-              <Link
-                to={item.path}
-                key={item.path} // Key goes on the Link
-                onClick={onClose} // Close sidebar when a link is clicked
-              >
+              <Link to={item.path} key={item.path} onClick={onClose}>
                 <li className="p-3 hover:bg-green-700 rounded flex items-center gap-3 transition-colors">
                   {item.icon} {item.name}
                 </li>

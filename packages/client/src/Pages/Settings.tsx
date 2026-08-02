@@ -2,6 +2,9 @@ import { useState, useRef } from "react";
 import { authClient } from "../lib/auth-client";
 import DashboardLayout from "../components/layouts/dashbord";
 import { Container, ItemContainer } from "../components/catalyst/container";
+import { Input, Label } from "../components/catalyst/input";
+import { Heading, Paragraph, Subheading } from "../components/catalyst/heading";
+import { Button } from "../components/catalyst/button";
 
 type Session = typeof authClient.$Infer.Session.session;
 
@@ -21,6 +24,7 @@ const Settings = () => {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [previewImg, setPreviewImg] = useState<string | undefined>(undefined);
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -34,6 +38,7 @@ const Settings = () => {
 
     setIsUploadingAvatar(true);
     try {
+      setPreviewImg(URL.createObjectURL(file));
       const urlRes = await fetch("/api/uploads/avatar-url", { method: "POST" });
       if (!urlRes.ok) throw new Error("Could not get an upload URL");
       const { uploadURL } = await urlRes.json();
@@ -61,7 +66,8 @@ const Settings = () => {
   };
 
   // B. Update name
-  const handleUpdateProfile = async () => {
+  const handleUpdateProfile = async (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!user) return;
     setIsSavingProfile(true);
     try {
@@ -78,7 +84,11 @@ const Settings = () => {
   };
 
   // C. Update password
-  const handleUpdatePassword = async () => {
+  const handleUpdatePassword = async (
+    e: React.SubmitEvent<HTMLFormElement>,
+  ) => {
+    e.preventDefault();
+    console.log("name");
     if (!user) return;
     setPasswordError("");
 
@@ -123,11 +133,11 @@ const Settings = () => {
 
   return (
     <DashboardLayout>
-      <Container className="h-dvh flex items-center justify-center bg-gray-100 p-4">
-        <ItemContainer className="w-full max-w-5xl h-[80%] bg-white rounded-2xl shadow-xl flex overflow-hidden border border-gray-200">
-          <div className="w-64 bg-gray-50 border-r border-gray-200 p-6 flex flex-col">
-            <h2 className="text-xl font-bold text-gray-800 mb-6">Settings</h2>
-            <ul className="flex flex-col gap-2 font-medium text-sm">
+      <Container className="h-dvh justify-start lg:justify-center">
+        <ItemContainer className="xl:min-w-4xl flex-col lg:flex-row shadow-none lg:shadow-2xl">
+          <div className="lg:w-64 bg-gray-50 border-r border-gray-200 p-6 flex flex-col  gap-5">
+            <Heading color="primary">Settings</Heading>
+            <ul className="flex lg:flex-col gap-2 font-medium text-sm">
               <li
                 onClick={() => setActiveTab("profile")}
                 className={`px-4 py-2 rounded-lg cursor-pointer ${activeTab === "profile" ? "bg-blue-100 text-blue-700" : "text-gray-600 hover:bg-gray-200"}`}
@@ -146,130 +156,107 @@ const Settings = () => {
           {/* RIGHT CONTENT AREA */}
           <div className="flex-1 p-10 overflow-y-auto">
             {activeTab === "profile" && (
-              <div className="max-w-2xl">
-                <h3 className="text-2xl font-semibold mb-6 border-b pb-4">
-                  Public Profile
-                </h3>
+              <div className="lg:max-w-2xl">
+                <Heading color="primary">Public Profile</Heading>
 
                 {/* Avatar Uploader */}
-                <div className="flex items-center gap-6 mb-8">
+                <div className="flex items-center gap-6 my-8">
                   <img
-                    src={user?.image ?? undefined}
+                    src={user?.image ?? previewImg}
                     alt="Profile Avatar"
-                    className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
+                    className="size-20 rounded-2xl object-cover border-2 border-gray-200"
                   />
                   <div>
-                    <input
+                    <Input
                       type="file"
                       accept="image/*"
                       hidden
                       ref={fileInputRef}
                       onChange={handleAvatarUpload}
                     />
-                    <button
+                    <Button
+                      variant="outline"
                       onClick={() => fileInputRef.current?.click()}
                       disabled={isUploadingAvatar}
-                      className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg shadow-sm hover:bg-gray-50 font-medium disabled:opacity-50"
                     >
                       {isUploadingAvatar ? "Uploading..." : "Manage Avatar"}
-                    </button>
-                    <p className="text-xs text-gray-500 mt-2">
-                      JPG, GIF or PNG. Max size of 10MB.
-                    </p>
+                    </Button>
+                    <Paragraph className="text-xs">
+                      JPG, GIF or PNG. Max size of 2MB.
+                    </Paragraph>
                   </div>
                 </div>
 
                 {/* Profile Form */}
-                <div className="grid grid-cols-1 gap-6">
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-gray-700">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="p-2 border rounded-md outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-semibold text-gray-700">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      value={user?.email ?? ""}
-                      disabled
-                      className="p-2 border rounded-md bg-gray-50 text-gray-500"
-                    />
-                    <p className="text-xs text-gray-400">
-                      Use the email change flow to update this — it needs OTP
-                      verification on both the old and new address.
-                    </p>
-                  </div>
-                </div>
+                <form onSubmit={handleUpdateProfile}>
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                  <Label htmlFor="email">Email Address</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={user?.email ?? ""}
+                    disabled
+                  />
+                  <Paragraph className="text-xs">
+                    Use the email change flow to update this — it needs OTP
+                    verification on both the old and new address.
+                  </Paragraph>
 
-                <button
-                  onClick={handleUpdateProfile}
-                  disabled={isSavingProfile}
-                  className="mt-8 bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 font-medium shadow-sm disabled:opacity-50"
-                >
-                  {isSavingProfile ? "Saving..." : "Save Changes"}
-                </button>
+                  <Button type="submit" disabled={isSavingProfile}>
+                    {isSavingProfile ? "Saving..." : "Save Changes"}
+                  </Button>
+                </form>
               </div>
             )}
 
             {activeTab === "security" && (
-              <div className="max-w-2xl">
-                <h3 className="text-2xl font-semibold mb-6 border-b pb-4">
-                  Security
-                </h3>
-                <div className="mb-10">
-                  <h4 className="text-lg font-medium mb-4">Change Password</h4>
-                  <div className="flex flex-col gap-4 max-w-md">
-                    <input
+              <div className="lg:max-w-2xl">
+                <Heading color="primary">Security & Devices</Heading>
+                <div className="my-10">
+                  <Subheading className="mb-2">Change Password</Subheading>
+                  <form onSubmit={handleUpdatePassword}>
+                    <Input
                       type="password"
+                      required
                       placeholder="Current Password"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <input
+                    <Input
                       type="password"
+                      required
                       placeholder="New Password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className="p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
                     />
-                    <input
+                    <Input
                       type="password"
+                      required
                       placeholder="Confirm New Password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="p-2 border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-blue-500"
                     />
 
                     {passwordError && (
-                      <p className="text-red-500 text-sm font-medium">
+                      <p className="text-red-500 text-sm font-medium my-2">
                         {passwordError}
                       </p>
                     )}
-
-                    <button
-                      onClick={handleUpdatePassword}
-                      disabled={
-                        isUpdatingPassword || !currentPassword || !newPassword
-                      }
-                      className="bg-gray-800 text-white px-4 py-2 rounded-lg hover:bg-gray-900 font-medium w-fit mt-2 disabled:opacity-50"
-                    >
+                    <Button type="submit" disabled={isUpdatingPassword}>
                       {isUpdatingPassword ? "Updating..." : "Update Password"}
-                    </button>
-                  </div>
+                    </Button>
+                  </form>
                 </div>
 
                 <div>
-                  <h4 className="text-lg font-medium mb-4">Active Devices</h4>
-                  <div className="flex flex-col gap-3">
+                  <Subheading>Active Devices</Subheading>
+                  <div className="flex flex-col gap-3 mb-3">
                     {sessions.map((s) => {
                       const isCurrentSession =
                         s.token === currentSession?.token;
@@ -304,12 +291,12 @@ const Settings = () => {
                               Active Now
                             </span>
                           ) : (
-                            <button
+                            <Button
+                              variant="destructive"
                               onClick={() => handleRevokeSession(s.token)}
-                              className="text-red-600 border border-red-200 hover:bg-red-50 px-3 py-1 rounded text-sm font-medium transition-colors"
                             >
                               Sign Out
-                            </button>
+                            </Button>
                           )}
                         </div>
                       );

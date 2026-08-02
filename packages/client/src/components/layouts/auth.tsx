@@ -14,13 +14,13 @@ const AuthLayout = ({ children }: { children: ReactNode }) => {
         />
       </Container>
 
-      <div className="z-0 flex flex-col p-10 mx-auto">
+      <div className="z-0 flex flex-col md:p-10 p-5 h-20">
         <Heading color="success" className="flex items-center gap-3">
           <Recycle size={90} />
           WASTE SEGREGATON
         </Heading>
         <Subheading>Management System</Subheading>
-        <span className="mt-5 max-w-4/5 mb-2 px-3 py-1 text-xs font-bold tracking-widest text-gray-800 uppercase bg-emerald-500/50 rounded-full border ">
+        <span className="mt-5 md:max-w-4/5 px-3 py-1 text-xs font-bold tracking-widest text-gray-800 uppercase bg-emerald-500/50 rounded-full border ">
           Smart waste management and robotics-powered segregation for a cleaner
           and greener future
         </span>

@@ -28,7 +28,7 @@ export const Heading = ({
   return (
     <h1
       className={cx(
-        "text-3xl font-bold tracking-tight sm:text-4xl",
+        "text-xl font-bold tracking-tight sm:text-3xl",
         textColors[color],
         className,
       )}
@@ -50,7 +50,7 @@ export const Subheading = ({
   return (
     <h2
       className={cx(
-        "text-xl font-semibold tracking-tight sm:text-2xl",
+        "text-lg font-semibold tracking-tight sm:text-xl",
         textColors[color],
         className,
       )}

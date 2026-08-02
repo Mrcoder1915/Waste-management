@@ -26,6 +26,12 @@ export const createAuth = (env: env) => {
         clientSecret: env.GOOGLE_CLIENT_SECRET as string,
       },
     },
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60,
+      },
+    },
     plugins: [
       admin(),
       magicLink({

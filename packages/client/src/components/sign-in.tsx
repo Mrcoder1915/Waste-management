@@ -62,7 +62,7 @@ export function SignInForm() {
   };
 
   return (
-    <div className="px-15 py-20 mx-auto max-w-md rounded-xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+    <div className="px-15 py-20 mx-auto max-w-md rounded-xl border border-slate-200 bg-[rgba(255,255,255,.1)] backdrop-blur-xs md:bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
       <div className="mb-6 flex rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
         <button
           type="button"
