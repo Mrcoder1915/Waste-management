@@ -6,11 +6,8 @@ import {
   LogOut,
   Bell,
   ChevronDown,
-  Plus,
   SlidersHorizontal,
-  Pencil,
   Ban,
-  CheckCircle2,
   ShieldCheck,
   Trash2,
   Recycle,
@@ -27,7 +24,6 @@ import {
 } from "recharts";
 import { Button } from "../../components/catalyst/button";
 import { StatCard } from "../../components/catalyst/card";
-import { IconAction } from "../../components/catalyst/icon";
 import { SearchInput } from "../../components/catalyst/input";
 import { Panel } from "../../components/catalyst/panel";
 import { Pagination } from "../../components/pagination";
@@ -42,9 +38,11 @@ import {
   CHART_DATA,
 } from "../../lib/mock-data";
 import { TONE_ICON_BG } from "../../lib/tone-style";
-import { AppUser, Session } from "../../types/user";
+import { Session } from "../../types/user";
 import { NavItem, PageId } from "../../types/nav";
 import { LogEntry } from "../../types/logs";
+import UserManagement from "../../components/user-management";
+import Topbar from "../../components/Topbar";
 
 function useSession(): Session {
   return {
@@ -134,52 +132,6 @@ function Sidebar({ active, onNavigate }: SidebarProps) {
     </aside>
   );
 }
-
-interface TopbarProps {
-  title: string;
-  subtitle?: string;
-}
-
-function Topbar({ title, subtitle }: TopbarProps) {
-  const { data } = useSession();
-  const initials = data.user.name
-    .split(" ")
-    .map((p) => p[0])
-    .join("")
-    .slice(0, 2);
-
-  return (
-    <div className="flex items-center justify-between mb-6">
-      <div>
-        <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
-        {subtitle && (
-          <p className="text-sm text-slate-400 mt-0.5">{subtitle}</p>
-        )}
-      </div>
-      <div className="flex items-center gap-4">
-        <button className="relative size-9 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100">
-          <Bell className="size-4.5" />
-          <span className="absolute top-1.5 right-1.5 size-3.5 rounded-full bg-red-500 text-white text-[9px] leading-[14px]">
-            3
-          </span>
-        </button>
-        <div className="flex items-center gap-2 pl-3 border-l border-slate-200">
-          <div className="size-8 rounded-full bg-emerald-100 text-emerald-700 text-xs font-semibold flex items-center justify-center">
-            {initials}
-          </div>
-          <span className="text-sm font-medium text-slate-700">
-            {data.user.name}
-          </span>
-          <ChevronDown className="size-3.5 text-slate-400" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/*  Mock data                                                           */
-/* ------------------------------------------------------------------ */
 
 function OverviewPage() {
   const { data } = useSession();
@@ -307,104 +259,6 @@ function OverviewPage() {
 /*  User Management page                                                */
 /* ------------------------------------------------------------------ */
 
-function UserManagementPage() {
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
-
-  const filtered = useMemo<AppUser[]>(
-    () =>
-      USERS.filter(
-        (u) =>
-          u.name.toLowerCase().includes(query.toLowerCase()) ||
-          u.email.includes(query.toLowerCase()),
-      ),
-    [query],
-  );
-
-  return (
-    <>
-      <Topbar
-        title="User Management"
-        subtitle="Manage and monitor all system users."
-      />
-
-      <Panel title="" className="p-5">
-        <div className="flex items-center gap-3 mb-4">
-          <SearchInput
-            placeholder="Search users..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <div className="flex-1" />
-          <Button variant="secondary">
-            <SlidersHorizontal className="size-4" />
-            Filter
-          </Button>
-          <Button>
-            <Plus className="size-4" />
-            Add User
-          </Button>
-        </div>
-
-        <Table
-          columns={[
-            "ID",
-            "Full Name",
-            "Email",
-            "Role",
-            "Status",
-            "Last Active",
-            "Actions",
-          ]}
-        >
-          {filtered.map((u) => (
-            <tr
-              key={u.id}
-              className="border-b border-slate-100 last:border-0 hover:bg-slate-50/60"
-            >
-              <td className="py-3 px-5 text-slate-400">{u.id}</td>
-              <td className="py-3 px-5 font-medium text-slate-800">{u.name}</td>
-              <td className="py-3 px-5 text-slate-500">{u.email}</td>
-              <td className="py-3 px-5">
-                <Badge tone={u.roleTone}>{u.role}</Badge>
-              </td>
-              <td className="py-3 px-5">
-                <Badge tone={u.status === "Active" ? "green" : "red"} dot>
-                  {u.status}
-                </Badge>
-              </td>
-              <td className="py-3 px-5 text-slate-400">{u.lastActive}</td>
-              <td className="py-3 px-5">
-                <div className="flex items-center gap-2">
-                  <IconAction>
-                    <Pencil className="size-3.5" />
-                  </IconAction>
-                  {u.status === "Active" ? (
-                    <IconAction tone="red">
-                      <Ban className="size-3.5" />
-                    </IconAction>
-                  ) : (
-                    <IconAction tone="green">
-                      <CheckCircle2 className="size-3.5" />
-                    </IconAction>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
-        </Table>
-
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
-          <p className="text-xs text-slate-400">
-            Showing 1 to {filtered.length} of 156 users
-          </p>
-          <Pagination page={page} total={32} onChange={setPage} />
-        </div>
-      </Panel>
-    </>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 /*  Activity Logs page                                                  */
 /* ------------------------------------------------------------------ */
@@ -488,7 +342,7 @@ export default function SuperAdmin() {
       <Sidebar active={active} onNavigate={setActive} />
       <main className="flex-1 p-7 min-w-0">
         {active === "overview" && <OverviewPage />}
-        {active === "users" && <UserManagementPage />}
+        {active === "users" && <UserManagement />}
         {active === "logs" && <ActivityLogsPage />}
       </main>
     </div>

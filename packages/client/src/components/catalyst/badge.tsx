@@ -7,6 +7,8 @@ type BadgeProps = {
   tone?: Tone;
   children: ReactNode;
   dot?: boolean;
+  size?: "sm" | "md" | "lg" | "xl";
+  className?: string;
 };
 
 type IconBadgeProps = {
@@ -14,12 +16,23 @@ type IconBadgeProps = {
   tone: Tone;
 };
 
-export function Badge({ tone = "slate", children, dot = false }: BadgeProps) {
+export function Badge({
+  className,
+  tone = "slate",
+  children,
+  size,
+  dot = false,
+}: BadgeProps) {
   return (
     <span
       className={cx(
         "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium",
         TONE_BG[tone],
+        className,
+        size === "sm" && "text-xs! mt-2",
+        size === "md" && "text-sm! mt-3",
+        size === "lg" && "text-base! mt-4",
+        size === "xl" && "text-2xl! mt-5",
       )}
     >
       {dot && <span className={cx("size-1.5 rounded-full", TONE_DOT[tone])} />}

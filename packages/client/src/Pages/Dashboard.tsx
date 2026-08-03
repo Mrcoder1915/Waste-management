@@ -1,6 +1,4 @@
 import Topbar from "../components/Topbar";
-import { FaLeaf, FaRecycle, FaTrash, FaChartPie } from "react-icons/fa";
-import { GoDotFill } from "react-icons/go";
 import { CardContainer, Card } from "../components/catalyst/card";
 import { ChartContainer } from "../components/catalyst/chart";
 import DashboardLayout from "../components/layouts/dashbord";
@@ -16,8 +14,10 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import { Container, ItemContainer } from "../components/catalyst/container";
+import { ItemContainer } from "../components/catalyst/container";
 import { ProgressBar } from "../components/ProgressBar";
+import { Subheading } from "../components/catalyst/heading";
+import { Badge } from "../components/catalyst/badge";
 
 const data = [
   { name: "Jan", Biodegradable: 400, NonBiodegradable: 240, Residual: 110 },
@@ -36,42 +36,44 @@ const Dashboard = () => {
     <DashboardLayout>
       <div className="flex w-full bg-gray-100 min-h-screen">
         <div className="flex-1 p-8">
-          <Topbar />
+          <Topbar
+            title="Dashboard"
+            subtitle="Welcome back, Admin! Here's your waste overview."
+          />
           <CardContainer>
             <Card>
               <div>
-                <h1 className="mb-4 font-semibold">System Status</h1>
-                <h2 className="text-green-500 text-sm font-medium flex items-center gap-2">
-                  <span>{<GoDotFill />}</span>Active
-                </h2>
+                <Subheading>System Status</Subheading>
+                <Badge tone="green" dot size="xl">
+                  Active
+                </Badge>
               </div>
             </Card>
             <Card>
-              <div className={`text-2xl`}></div>
               <div>
-                <h1 className="mb-4 font-semibold">Total Segragated Today</h1>
-                <h2 className="text-6xl font-bold flex flex-col gap-2">
-                  1,245 <span className="text-2xl font-normal">Items</span>
-                </h2>
+                <Subheading>Total Segragated Today</Subheading>
+                <Badge tone="purple" dot size="xl">
+                  1,245 Items
+                </Badge>
               </div>
             </Card>
             <Card>
-              <div className="flex flex-col gap-2">
-                <h1 className="mb-4 font-semibold">Waste Breakdown</h1>
-                <h2 className="text-sm font-medium flex items-center gap-2">
-                  {<GoDotFill className="text-green-500" />}Bio 45%
-                </h2>
-                <h2 className="text-sm font-medium flex items-center gap-2">
-                  {<GoDotFill className="text-yellow-500" />} Non Bio 35%
-                </h2>
-                <h2 className="text-sm font-medium flex items-center gap-2">
-                  {<GoDotFill className="text-red-500" />} Residual 25%
-                </h2>
+              <div>
+                <Subheading>Waste Breakdown</Subheading>
+                <Badge tone="green" dot size="md">
+                  Biodegradable: 45%
+                </Badge>
+                <Badge tone="amber" dot size="md">
+                  Non Bio 35%
+                </Badge>
+                <Badge tone="red" dot size="md">
+                  Residual 25%
+                </Badge>
               </div>
             </Card>
             <Card className="flex-col">
               <div>
-                <h1 className="mb-4 font-semibold">Active Bins</h1>
+                <Subheading>Active Bins</Subheading>
                 <ProgressBar
                   label="Bio"
                   percentage={65}
@@ -92,9 +94,7 @@ const Dashboard = () => {
           </CardContainer>
           <CardContainer className="lg:grid-cols-2!">
             <ChartContainer>
-              <h2 className="mb-4 text-2xl font-semibold">
-                Todays Segragation Trends
-              </h2>
+              <Subheading>Todays Segragation Trends</Subheading>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={data}
@@ -166,9 +166,7 @@ const Dashboard = () => {
               </ResponsiveContainer>
             </ChartContainer>
             <ItemContainer className="flex-col p-5 bg-white ">
-              <h1 className="mb-4 text-2xl font-semibold">
-                Recent Activity Feed
-              </h1>
+              <Subheading>Recent Activity Feed</Subheading>
               <div className="flex flex-col gap-2 bg-gray-50 p-4 rounded-lg shadow-sm h-100 overflow-y-auto [&>div]:w-full [&>div]:flex [&>div]:flex-row [&>div]:gap-4  [&>div]:m-auto [&>div]:p-3">
                 <div>
                   <div className="pr-5 border-r-2 border-[rgba(0,0,0,.25)]">

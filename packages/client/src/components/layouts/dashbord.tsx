@@ -1,12 +1,13 @@
 import { useState, ReactNode } from "react";
 import { FaBars } from "react-icons/fa";
 import Sidebar from "../Sidebar";
-import { FaHome, FaRecycle, FaChartLine, FaCog } from "react-icons/fa";
+import { FaHome, FaRecycle, FaChartLine, FaCog, FaUser } from "react-icons/fa";
 
 const navItems = [
   { name: "Overview", icon: <FaHome />, path: "/" },
   { name: "Segregation", icon: <FaRecycle />, path: "/segregation" },
   { name: "Reports", icon: <FaChartLine />, path: "/reports" },
+  { name: "User Management", icon: <FaUser />, path: "/user-management" },
   { name: "Settings", icon: <FaCog />, path: "/settings" },
 ];
 

@@ -134,7 +134,7 @@ const Settings = () => {
   return (
     <DashboardLayout>
       <Container className="h-dvh justify-start lg:justify-center">
-        <ItemContainer className="xl:min-w-4xl flex-col lg:flex-row shadow-none lg:shadow-2xl">
+        <ItemContainer className="min-w-full  xl:min-w-4xl flex-col lg:flex-row shadow-none lg:shadow-2xl">
           <div className="lg:w-64 bg-gray-50 border-r border-gray-200 p-6 flex flex-col  gap-5">
             <Heading color="primary">Settings</Heading>
             <ul className="flex lg:flex-col gap-2 font-medium text-sm">

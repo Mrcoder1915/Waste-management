@@ -10,6 +10,8 @@ import {
   ArcElement,
 } from "chart.js";
 import DashboardLayout from "../components/layouts/dashbord";
+import Topbar from "../components/Topbar";
+import { Button } from "../components/catalyst/button";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -42,24 +44,15 @@ export default function BeautifulReports() {
         {/* MAIN CONTENT AREA */}
         <main className="flex-1 overflow-y-auto p-8">
           {/* Header Section */}
-          <header className="flex justify-between items-end mb-10">
-            <div>
-              <h1 className="text-3xl font-black tracking-tight text-slate-900">
-                Waste Analytics
-              </h1>
-              <p className="text-slate-500 font-medium">
-                Monitoring segregation performance & system health.
-              </p>
-            </div>
-            <div className="flex gap-3 flex-col md:flex-row">
-              <button className="bg-white px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-bold shadow-sm hover:shadow-md transition">
-                Export
-              </button>
-              <button className="bg-emerald-600 px-5 py-2.5 rounded-xl text-white text-sm font-bold shadow-lg shadow-emerald-200 hover:bg-emerald-700 transition">
-                Live View
-              </button>
-            </div>
-          </header>
+
+          <Topbar
+            title="Reports"
+            subtitle="Detailed insights into waste segregation and processing."
+          />
+          <div className="gap-2 flex justify-end mb-5">
+            <Button variant="outline">Export</Button>
+            <Button variant="primary">Live View</Button>
+          </div>
 
           {/* 2. STATS GRID WITH GRADIENT ACCENTS */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">

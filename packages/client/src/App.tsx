@@ -8,6 +8,7 @@ import Settings from "./Pages/Settings";
 import NotFound from "./Pages/NotFound";
 import SuperAdmin from "./Pages/super-admin/Dashboard";
 import SuperAdminProtection from "./ProtectedRoute/super-admin";
+import UserManagementPage from "./Pages/user-management";
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
           <Route path="/segregation" element={<Segregation />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/user-management" element={<UserManagementPage />} />
           <Route element={<SuperAdminProtection />}>
             <Route path="/super-admin" element={<SuperAdmin />} />
           </Route>
