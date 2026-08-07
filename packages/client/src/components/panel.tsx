@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { cx } from "../../lib/cx";
+import { cx } from "../lib/cx";
 
 interface PanelProps {
   title: string;

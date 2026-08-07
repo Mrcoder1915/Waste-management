@@ -9,6 +9,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     | "dark"
     | "destructive"
     | "soft"
+    | "soft-emerald"
+    | "glass"
+    | "glass-danger"
     | "ghost"
     | "outline"
     | "warning";
@@ -41,6 +44,18 @@ export function Button({
 
     // Soft/Subtle (Alternative secondary with background tint)
     soft: "bg-slate-100 text-slate-700 hover:bg-slate-200 transition-colors dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700",
+
+    // Soft emerald (pastel tint — matches the app's primary accent)
+    "soft-emerald":
+      "bg-emerald-50 text-emerald-700 border border-emerald-100 hover:bg-emerald-100 active:scale-95 transition-all",
+
+    // Glass (translucent — for overlaying on video/media so the feed shows through)
+    glass:
+      "bg-white/10 text-white border border-white/25 backdrop-blur-sm hover:bg-white/20 active:scale-95 transition-all",
+
+    // Glass danger (translucent red for overlays — keeps the destructive identity)
+    "glass-danger":
+      "bg-red-500/25 text-white border border-red-400/50 backdrop-blur-sm hover:bg-red-500/45 active:scale-95 transition-all",
 
     // Ghost (Completely transparent background until hover, great for secondary nav or icon buttons)
     ghost:

@@ -1,8 +1,9 @@
 import { FaTimes, FaSignOutAlt } from "react-icons/fa";
-import { signOut, useSession } from "../lib/auth-client";
-import { Link } from "react-router-dom";
+import { signOut } from "../lib/auth-client";
+import { NavLink } from "react-router-dom";
 import { JSX } from "react";
 import { Recycle } from "lucide-react";
+import { cx } from "../lib/cx";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -11,8 +12,6 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose, navItems }: SidebarProps) {
-  const { data: session, isPending } = useSession();
-
   return (
     <>
       {/* 1. MOBILE OVERLAY (Darkens the background when sidebar is open) */}
@@ -54,22 +53,33 @@ export default function Sidebar({ isOpen, onClose, navItems }: SidebarProps) {
 
           <ul className="space-y-3">
             {navItems.map((item) => (
-              <Link to={item.path} key={item.path} onClick={onClose}>
-                <li className="p-3 hover:bg-green-700 rounded flex items-center gap-3 transition-colors">
+              <li key={item.path}>
+                <NavLink
+                  to={item.path}
+                  end={item.path === "/"}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    cx(
+                      "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors",
+                      isActive
+                        ? "bg-emerald-500/15 text-white"
+                        : "text-white/70 hover:bg-white/5",
+                    )
+                  }
+                >
                   {item.icon} {item.name}
-                </li>
-              </Link>
+                </NavLink>
+              </li>
             ))}
           </ul>
         </div>
 
         <div className="border-t border-green-700 pt-6">
-          <p className="mb-2 font-medium">{session?.user?.name}</p>
           <button
-            className="flex items-center gap-2 text-sm hover:text-red-300 transition-colors"
             onClick={() => signOut()}
+            className="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-red-300 border border-red-500/30 bg-red-500/10 hover:bg-red-500 hover:text-white hover:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/40 transition-colors"
           >
-            <FaSignOutAlt /> Logout
+            <FaSignOutAlt className="text-base" /> Logout
           </button>
         </div>
       </div>

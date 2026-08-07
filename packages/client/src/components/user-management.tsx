@@ -11,25 +11,50 @@ import { AppUser } from "../types/user";
 import { Button } from "./catalyst/button";
 import { IconAction } from "./catalyst/icon";
 import { SearchInput } from "./catalyst/input";
-import { Panel } from "./catalyst/panel";
+import { Panel } from "./panel";
 import { Pagination } from "./pagination";
 import Topbar from "./Topbar";
-import { Table } from "./catalyst/table";
+import { Table } from "./table";
 import { Badge } from "./catalyst/badge";
+import { AddUserModal, NewUser } from "./add-user-modal";
 
-const UserManagement = () => {
+interface UserManagementProps {
+  /** Enables the Super Admin role in the Add User modal (super-admin dashboard only). */
+  allowSuperAdmin?: boolean;
+}
+
+const UserManagement = ({ allowSuperAdmin = false }: UserManagementProps) => {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(1);
+  const [users, setUsers] = useState<AppUser[]>(USERS);
+  const [addOpen, setAddOpen] = useState(false);
 
   const filtered = useMemo<AppUser[]>(
     () =>
-      USERS.filter(
+      users.filter(
         (u) =>
           u.name.toLowerCase().includes(query.toLowerCase()) ||
           u.email.includes(query.toLowerCase()),
       ),
-    [query],
+    [users, query],
   );
+
+  const handleAddUser = (user: NewUser) => {
+    setUsers((prev) => [
+      {
+        ...user,
+        id: Math.max(0, ...prev.map((u) => u.id)) + 1,
+        lastActive: new Date().toLocaleString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+          hour: "numeric",
+          minute: "2-digit",
+        }),
+      },
+      ...prev,
+    ]);
+  };
 
   return (
     <>
@@ -39,21 +64,26 @@ const UserManagement = () => {
       />
 
       <Panel title="" className="p-5">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-4">
           <SearchInput
             placeholder="Search users..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <div className="flex-1" />
-          <Button variant="secondary">
-            <SlidersHorizontal className="size-4" />
-            Filter
-          </Button>
-          <Button>
-            <Plus className="size-4" />
-            Add User
-          </Button>
+          <div className="hidden sm:block flex-1" />
+          <div className="flex items-center gap-3">
+            <Button variant="secondary" className="flex-1 sm:flex-none">
+              <SlidersHorizontal className="size-4" />
+              Filter
+            </Button>
+            <Button
+              onClick={() => setAddOpen(true)}
+              className="flex-1 sm:flex-none"
+            >
+              <Plus className="size-4" />
+              Add User
+            </Button>
+          </div>
         </div>
 
         <Table
@@ -104,13 +134,20 @@ const UserManagement = () => {
           ))}
         </Table>
 
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-slate-100">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-4 pt-4 border-t border-slate-100">
           <p className="text-xs text-slate-400">
             Showing 1 to {filtered.length} of 156 users
           </p>
           <Pagination page={page} total={32} onChange={setPage} />
         </div>
       </Panel>
+
+      <AddUserModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        onSubmit={handleAddUser}
+        allowSuperAdmin={allowSuperAdmin}
+      />
     </>
   );
 };

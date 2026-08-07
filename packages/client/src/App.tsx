@@ -6,7 +6,10 @@ import Segregation from "./Pages/Segregation";
 import Reports from "./Pages/Reports";
 import Settings from "./Pages/Settings";
 import NotFound from "./Pages/NotFound";
-import SuperAdmin from "./Pages/super-admin/Dashboard";
+import SuperAdminLayout from "./Pages/super-admin/SuperAdminLayout";
+import SuperAdminOverview from "./Pages/super-admin/Overview";
+import SuperAdminUsers from "./Pages/super-admin/Users";
+import SuperAdminLogs from "./Pages/super-admin/Logs";
 import SuperAdminProtection from "./ProtectedRoute/super-admin";
 import UserManagementPage from "./Pages/user-management";
 
@@ -21,7 +24,11 @@ export default function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/user-management" element={<UserManagementPage />} />
           <Route element={<SuperAdminProtection />}>
-            <Route path="/super-admin" element={<SuperAdmin />} />
+            <Route path="/super-admin" element={<SuperAdminLayout />}>
+              <Route index element={<SuperAdminOverview />} />
+              <Route path="users" element={<SuperAdminUsers />} />
+              <Route path="logs" element={<SuperAdminLogs />} />
+            </Route>
           </Route>
         </Route>
         <Route path="/sign-in" element={<SignInPage />} />

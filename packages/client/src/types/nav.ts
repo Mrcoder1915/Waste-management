@@ -1,9 +1,10 @@
 import { type LucideIcon } from "lucide-react";
 
-export type PageId = "overview" | "users" | "logs";
-
 export interface NavItem {
-  id: PageId;
   label: string;
   icon: LucideIcon;
+  /** Route path for this nav item. */
+  to: string;
+  /** Match only the exact path (used for the index route). */
+  end?: boolean;
 }

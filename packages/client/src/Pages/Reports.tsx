@@ -12,6 +12,7 @@ import {
 import DashboardLayout from "../components/layouts/dashbord";
 import Topbar from "../components/Topbar";
 import { Button } from "../components/catalyst/button";
+import { Subheading } from "../components/catalyst/heading";
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -104,9 +105,7 @@ export default function BeautifulReports() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
             <div className="lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-slate-100">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="font-black text-lg text-slate-800 uppercase tracking-tighter">
-                  Volume Over Time
-                </h3>
+                <Subheading>Volume Over Time</Subheading>
                 <select className="bg-slate-50 border-none rounded-lg text-xs font-bold px-3 py-1 text-slate-500">
                   <option>Last 7 Days</option>
                   <option>Last 30 Days</option>

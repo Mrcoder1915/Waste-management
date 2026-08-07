@@ -1,22 +1,17 @@
-"use client";
-
 import { useState } from "react";
 import { authClient } from "../lib/auth-client";
+import { Input, Label } from "./catalyst/input";
+import { Button } from "./catalyst/button";
 
 export function SignInForm() {
-  const [method, setMethod] = useState<"password" | "magic-link">("password");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handlePasswordSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSignIn = async () => {
     setLoading(true);
-    setMessage(null);
+    setError(null);
 
     await authClient.signIn.email(
       {
@@ -26,140 +21,73 @@ export function SignInForm() {
       },
       {
         onRequest: () => setLoading(true),
-        onSuccess: () => {
-          setLoading(false);
-        },
+        onSuccess: () => setLoading(false),
         onError: (ctx) => {
           setLoading(false);
-          setMessage({ type: "error", text: ctx.error.message });
+          setError(ctx.error.message);
         },
       },
     );
   };
 
-  const handleMagicLinkSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage(null);
-
-    const { error } = await authClient.signIn.magicLink({
-      email,
-      callbackURL: "/",
-    });
-
-    setLoading(false);
-    if (error) {
-      setMessage({
-        type: "error",
-        text: error.message || "cant sign in, please try again",
-      });
-    } else {
-      setMessage({
-        type: "success",
-        text: "Magic link sent! Check your inbox.",
-      });
-    }
-  };
-
   return (
-    <div className="px-15 py-20 mx-auto max-w-md rounded-xl border border-slate-200 bg-[rgba(255,255,255,.1)] backdrop-blur-xs md:bg-white p-8 shadow-sm dark:border-slate-800 dark:bg-slate-900">
-      <div className="mb-6 flex rounded-lg bg-slate-100 p-1 dark:bg-slate-800">
-        <button
-          type="button"
-          onClick={() => setMethod("password")}
-          className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
-            method === "password"
-              ? "bg-white text-slate-950 shadow-sm dark:bg-slate-900 dark:text-white"
-              : "text-slate-600 dark:text-slate-400"
-          }`}
-        >
-          Password
-        </button>
-        <button
-          type="button"
-          onClick={() => setMethod("magic-link")}
-          className={`flex-1 rounded-md py-2 text-sm font-medium transition-colors ${
-            method === "magic-link"
-              ? "bg-white text-slate-950 shadow-sm dark:bg-slate-900 dark:text-white"
-              : "text-slate-600 dark:text-slate-400"
-          }`}
-        >
-          Magic Link
-        </button>
+    <div className="w-full max-w-md mx-auto rounded-2xl border border-white/40 bg-white/70 backdrop-blur-2xl p-8 shadow-2xl">
+      <div className="mb-6">
+        <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
+        <p className="mt-1 text-sm text-slate-600">
+          Sign in to your account to continue.
+        </p>
       </div>
 
-      {message && (
-        <div
-          className={`mb-4 rounded-md p-3 text-sm ${
-            message.type === "error"
-              ? "bg-red-50 text-red-600 dark:bg-red-950/50 dark:text-red-400"
-              : "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400"
-          }`}
-        >
-          {message.text}
+      {error && (
+        <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+          {error}
         </div>
       )}
 
-      {method === "password" ? (
-        <form onSubmit={handlePasswordSignIn} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Email
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-              placeholder="you@example.com"
-            />
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSignIn();
+        }}
+        className="space-y-1"
+      >
+        <div>
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <a
+              href="#"
+              className="mb-2 text-xs font-medium text-emerald-700 hover:underline"
+            >
+              Forgot password?
+            </a>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Password
-            </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-              placeholder="••••••••"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loading ? "Signing in..." : "Sign In with Password"}
-          </button>
-        </form>
-      ) : (
-        <form onSubmit={handleMagicLinkSignIn} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-              Email Address
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-slate-900 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
-              placeholder="you@example.com"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-blue-600 py-2 text-white font-medium hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loading ? "Sending link..." : "Send Magic Link"}
-          </button>
-        </form>
-      )}
+          <Input
+            id="password"
+            type="password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="••••••••"
+          />
+        </div>
+
+        <Button type="submit" disabled={loading} className="w-full mt-4">
+          {loading ? "Signing in..." : "Sign In"}
+        </Button>
+      </form>
     </div>
   );
 }
