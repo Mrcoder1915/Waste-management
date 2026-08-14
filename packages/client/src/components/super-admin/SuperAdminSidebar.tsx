@@ -2,7 +2,8 @@ import { LayoutGrid, Users, FileText, LogOut, Recycle } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { cx } from "../../lib/cx";
 import { NavItem } from "../../types/nav";
-import { useSession, signOut } from "../../Pages/super-admin/session";
+import { useSession } from "../../Pages/super-admin/session";
+import { signOut } from "../../lib/auth-client";
 
 const NAV: NavItem[] = [
   { label: "Overview", icon: LayoutGrid, to: "/super-admin", end: true },
@@ -62,7 +63,7 @@ export default function SuperAdminSidebar() {
 
       <div className="p-3">
         <button
-          onClick={signOut}
+          onClick={() => signOut()}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-300 border border-red-500/30 bg-red-500/10 hover:bg-red-500 hover:text-white hover:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-500/40 transition-colors"
         >
           <LogOut className="size-4.5" />

@@ -8,3 +8,7 @@ GITHUB_SECRET=your-github-client-secret
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 GOOGLE_REFRESH_TOKEN=
+EMAIL_FROM=onboarding@yourdomain.com
+CLIENT_URL=http://localhost:5173
+BREVO_API_KEY=
+EMAIL=your_email.com

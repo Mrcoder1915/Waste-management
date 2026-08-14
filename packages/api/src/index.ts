@@ -3,6 +3,7 @@ import { createAuth } from "./lib/auth.ts";
 import { cors } from "hono/cors";
 import { env } from "hono/adapter";
 import { BINDINGS } from "./types/factory.ts";
+import { userController } from "./controllers/user/invite.ts";
 
 const app = new Hono<BINDINGS>();
 app.use(
@@ -26,6 +27,7 @@ app.use("*", async (c, next) => {
 app.on(["POST", "GET"], "/api/auth/*", (c) => {
   return c.var.auth.handler(c.req.raw);
 });
+
 app.onError((err, c) => {
   console.error(`[Server Error]: ${err}`);
 
@@ -35,8 +37,7 @@ app.onError((err, c) => {
 
   return c.text("Oops! Something went wrong on our end.", 500);
 });
-app.get("/", (c) => {
-  return c.json("Hello Hono.jsss!");
-});
+
+app.route("/api/users", userController);
 
 export default app;

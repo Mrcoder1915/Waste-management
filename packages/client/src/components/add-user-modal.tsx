@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { UserPlus } from "lucide-react";
+import { Mail, UserPlus } from "lucide-react";
 import { Modal } from "./catalyst/modal";
 import { Button } from "./catalyst/button";
 import { Input, Label } from "./catalyst/input";
@@ -15,7 +15,7 @@ export type NewUser = Pick<
 interface AddUserModalProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (user: NewUser) => void;
+  onSubmit: (user: NewUser) => Promise<void> | void;
   /** Allow assigning the Super Admin role (super-admin dashboard only). */
   allowSuperAdmin?: boolean;
 }
@@ -35,8 +35,6 @@ const emptyForm = {
   name: "",
   email: "",
   role: "Operator",
-  password: "",
-  confirm: "",
 };
 
 type Errors = Partial<Record<keyof typeof emptyForm, string>>;
@@ -49,6 +47,8 @@ export function AddUserModal({
 }: AddUserModalProps) {
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState<Errors>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const roles = useMemo(
     () => (allowSuperAdmin ? [...BASE_ROLES, SUPER_ADMIN_ROLE] : BASE_ROLES),
@@ -60,6 +60,8 @@ export function AddUserModal({
     if (open) {
       setForm(emptyForm);
       setErrors({});
+      setSubmitError(null);
+      setSubmitting(false);
     }
   }, [open]);
 
@@ -73,27 +75,34 @@ export function AddUserModal({
     if (!form.name.trim()) next.name = "Full name is required.";
     if (!form.email.trim()) next.email = "Email is required.";
     else if (!EMAIL_RE.test(form.email)) next.email = "Enter a valid email.";
-    if (form.password.length < 8)
-      next.password = "Password must be at least 8 characters.";
-    if (form.confirm !== form.password)
-      next.confirm = "Passwords do not match.";
     return next;
   };
 
-  const submit = () => {
+  const submit = async () => {
     const found = validate();
     if (Object.keys(found).length) {
       setErrors(found);
       return;
     }
-    onSubmit({
-      name: form.name.trim(),
-      email: form.email.trim().toLowerCase(),
-      role: form.role,
-      roleTone: roles.find((r) => r.value === form.role)?.tone ?? "slate",
-      status: "Active",
-    });
-    onClose();
+
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      await onSubmit({
+        name: form.name.trim(),
+        email: form.email.trim().toLowerCase(),
+        role: form.role,
+        roleTone: roles.find((r) => r.value === form.role)?.tone ?? "slate",
+        status: "Invited",
+      });
+      onClose();
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "Failed to send the invite.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const selectClass =
@@ -103,21 +112,26 @@ export function AddUserModal({
     <Modal
       open={open}
       onClose={onClose}
-      title="Add New User"
-      subtitle="Create an account and assign a role."
+      title="Invite New User"
+      subtitle="Send an email invitation to join."
       icon={
         <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
-          <UserPlus className="size-5" />
+          <Mail className="size-5" />
         </span>
       }
       footer={
         <>
-          <Button type="button" variant="secondary" onClick={onClose}>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onClose}
+            disabled={submitting}
+          >
             Cancel
           </Button>
-          <Button type="submit" form="add-user-form">
+          <Button type="submit" form="add-user-form" disabled={submitting}>
             <UserPlus className="size-4" />
-            Add User
+            {submitting ? "Sending..." : "Send Invite"}
           </Button>
         </>
       }
@@ -131,6 +145,12 @@ export function AddUserModal({
         noValidate
         className="space-y-1"
       >
+        {submitError && (
+          <div className="mb-3 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            {submitError}
+          </div>
+        )}
+
         <div>
           <Label htmlFor="name">Full Name</Label>
           <Input
@@ -176,40 +196,10 @@ export function AddUserModal({
           </select>
         </div>
 
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Min. 8 characters"
-              value={form.password}
-              onChange={(e) => set("password", e.target.value)}
-              className={cx(
-                errors.password && "border-red-400 focus:border-red-500",
-              )}
-            />
-            {errors.password && (
-              <p className="mb-2 text-xs text-red-600">{errors.password}</p>
-            )}
-          </div>
-          <div>
-            <Label htmlFor="confirm">Confirm Password</Label>
-            <Input
-              id="confirm"
-              type="password"
-              placeholder="Re-enter password"
-              value={form.confirm}
-              onChange={(e) => set("confirm", e.target.value)}
-              className={cx(
-                errors.confirm && "border-red-400 focus:border-red-500",
-              )}
-            />
-            {errors.confirm && (
-              <p className="mb-2 text-xs text-red-600">{errors.confirm}</p>
-            )}
-          </div>
-        </div>
+        <p className="mt-4 text-xs text-slate-500">
+          The user will receive an email invitation and can sign in with a
+          one-time code sent to this address.
+        </p>
       </form>
     </Modal>
   );

@@ -17,6 +17,7 @@ import Topbar from "./Topbar";
 import { Table } from "./table";
 import { Badge } from "./catalyst/badge";
 import { AddUserModal, NewUser } from "./add-user-modal";
+import { inviteUser } from "../lib/api";
 
 interface UserManagementProps {
   /** Enables the Super Admin role in the Add User modal (super-admin dashboard only). */
@@ -39,18 +40,14 @@ const UserManagement = ({ allowSuperAdmin = false }: UserManagementProps) => {
     [users, query],
   );
 
-  const handleAddUser = (user: NewUser) => {
+  const handleAddUser = async (user: NewUser) => {
+    // Throws on failure so the modal can surface the error and stay open.
+    await inviteUser({ name: user.name, email: user.email, role: user.role });
     setUsers((prev) => [
       {
         ...user,
         id: Math.max(0, ...prev.map((u) => u.id)) + 1,
-        lastActive: new Date().toLocaleString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-          hour: "numeric",
-          minute: "2-digit",
-        }),
+        lastActive: "Invitation sent",
       },
       ...prev,
     ]);
@@ -109,7 +106,16 @@ const UserManagement = ({ allowSuperAdmin = false }: UserManagementProps) => {
                 <Badge tone={u.roleTone}>{u.role}</Badge>
               </td>
               <td className="py-3 px-5">
-                <Badge tone={u.status === "Active" ? "green" : "red"} dot>
+                <Badge
+                  tone={
+                    u.status === "Active"
+                      ? "green"
+                      : u.status === "Invited"
+                        ? "amber"
+                        : "red"
+                  }
+                  dot
+                >
                   {u.status}
                 </Badge>
               </td>

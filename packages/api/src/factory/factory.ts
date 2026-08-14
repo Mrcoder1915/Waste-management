@@ -15,7 +15,7 @@ export const factory = createFactory<BINDINGS>({
       await next();
     });
     app.use(async (c, next) => {
-      const resend = new Resend(env(c).RESEND_API_KEY);
+      const resend = new Resend(c.env.RESEND_API_KEY);
 
       c.set("resend", resend);
 

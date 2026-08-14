@@ -17,6 +17,6 @@ export interface AppUser {
   email: string;
   role: string;
   roleTone: Tone;
-  status: "Active" | "Banned";
+  status: "Active" | "Banned" | "Invited";
   lastActive: string;
 }

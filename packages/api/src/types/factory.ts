@@ -13,7 +13,11 @@ export type BINDINGS = {
     | "GOOGLE_CLIENT_ID"
     | "GOOGLE_CLIENT_SECRET"
     | "RESEND_API_KEY"
+    | "EMAIL_FROM"
+    | "CLIENT_URL"
     | "APP"
+    | "BREVO_API_KEY"
+    | "EMAIL"
   >;
   Variables: {
     db: NeonHttpDatabase;

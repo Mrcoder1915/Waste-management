@@ -4,9 +4,7 @@ import { useSession } from "../lib/auth-client";
 import { SignInForm } from "../components/sign-in";
 
 const SignInPage = () => {
-  const { data: session, isPending } = useSession();
-
-  if (isPending) return;
+  const { data: session } = useSession();
 
   if (session) return <Navigate to="/" />;
 

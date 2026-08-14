@@ -4,21 +4,35 @@ import { Input, Label } from "./catalyst/input";
 import { Button } from "./catalyst/button";
 
 export function SignInForm() {
+  const [step, setStep] = useState<"email" | "otp">("email");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSignIn = async () => {
+  const sendCode = async () => {
     setLoading(true);
     setError(null);
 
-    await authClient.signIn.email(
-      {
-        email,
-        password,
-        callbackURL: "/",
-      },
+    const { error } = await authClient.emailOtp.sendVerificationOtp({
+      email,
+      type: "sign-in",
+    });
+
+    setLoading(false);
+    if (error) {
+      setError(error.message ?? "Couldn't send the code. Try again.");
+      return;
+    }
+    setStep("otp");
+  };
+
+  const verifyCode = async () => {
+    setLoading(true);
+    setError(null);
+
+    await authClient.signIn.emailOtp(
+      { email, otp },
       {
         onRequest: () => setLoading(true),
         onSuccess: () => setLoading(false),
@@ -35,7 +49,9 @@ export function SignInForm() {
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-slate-900">Welcome back</h2>
         <p className="mt-1 text-sm text-slate-600">
-          Sign in to your account to continue.
+          {step === "email"
+            ? "Enter your email and we'll send you a one-time code."
+            : `Enter the code we sent to ${email}.`}
         </p>
       </div>
 
@@ -45,49 +61,68 @@ export function SignInForm() {
         </div>
       )}
 
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSignIn();
-        }}
-        className="space-y-1"
-      >
-        <div>
-          <Label htmlFor="email">Email</Label>
-          <Input
-            id="email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-          />
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <a
-              href="#"
-              className="mb-2 text-xs font-medium text-emerald-700 hover:underline"
-            >
-              Forgot password?
-            </a>
+      {step === "email" ? (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            sendCode();
+          }}
+          className="space-y-1"
+        >
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+            />
           </div>
-          <Input
-            id="password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-          />
-        </div>
 
-        <Button type="submit" disabled={loading} className="w-full mt-4">
-          {loading ? "Signing in..." : "Sign In"}
-        </Button>
-      </form>
+          <Button type="submit" disabled={loading} className="w-full mt-4">
+            {loading ? "Sending code..." : "Send code"}
+          </Button>
+        </form>
+      ) : (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            verifyCode();
+          }}
+          className="space-y-1"
+        >
+          <div>
+            <Label htmlFor="otp">One-time code</Label>
+            <Input
+              id="otp"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              required
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+              placeholder="123456"
+            />
+          </div>
+
+          <Button type="submit" disabled={loading} className="w-full mt-4">
+            {loading ? "Verifying..." : "Verify & sign in"}
+          </Button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setStep("email");
+              setOtp("");
+              setError(null);
+            }}
+            className="mt-3 w-full text-center text-xs font-medium text-emerald-700 hover:underline"
+          >
+            Use a different email
+          </button>
+        </form>
+      )}
     </div>
   );
 }
